@@ -12,7 +12,7 @@ import {
   tickSessions,
   TICK_INTERVAL_MS,
 } from "@/lib/simulation";
-import { playSaleSound } from "@/lib/sound";
+import { playSaleSound, unlockAudioOnFirstInteraction } from "@/lib/sound";
 import { useDashboardStore } from "@/lib/store";
 
 function formatCurrency(value: number): string {
@@ -28,6 +28,11 @@ const MILESTONE_THRESHOLDS = [25, 50, 75, 100];
  */
 export function SimulationRuntime() {
   const hasHydrated = useDashboardStore((s) => s.hasHydrated);
+
+  useEffect(() => {
+    if (!hasHydrated) return;
+    return unlockAudioOnFirstInteraction(useDashboardStore.getState().config.soundFile);
+  }, [hasHydrated]);
 
   useEffect(() => {
     if (!hasHydrated) return;
@@ -77,7 +82,11 @@ export function SimulationRuntime() {
         });
 
         if (state.config.soundEnabled) {
-          playSaleSound(state.config.soundFile);
+          playSaleSound(state.config.soundFile).then((result) => {
+            if (!result.ok) {
+              toast.error(`No se pudo reproducir el sonido: ${result.error}`);
+            }
+          });
         }
 
         if (state.config.ntfyEnabled) {

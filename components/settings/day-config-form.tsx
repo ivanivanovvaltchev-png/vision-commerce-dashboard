@@ -24,6 +24,7 @@ import {
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { sendNtfyNotification } from "@/lib/ntfy";
+import { playSaleSound } from "@/lib/sound";
 import { useDashboardStore } from "@/lib/store";
 import { DayConfig, ProfitMode, SimulationSpeed } from "@/lib/types";
 import { RotateCcw, Smartphone } from "lucide-react";
@@ -232,6 +233,7 @@ function DayConfigFormFields() {
               placeholder="ka-ching.mp3"
             />
           </div>
+          <TestSoundButton fileName={draft.soundFile} />
         </CardContent>
       </Card>
 
@@ -290,6 +292,27 @@ function DayConfigFormFields() {
         </CardContent>
       </Card>
     </div>
+  );
+}
+
+function TestSoundButton({ fileName }: { fileName: string }) {
+  const [playing, setPlaying] = useState(false);
+
+  async function handleClick() {
+    setPlaying(true);
+    const result = await playSaleSound(fileName);
+    setPlaying(false);
+    if (result.ok) {
+      toast.success("Sonido reproducido");
+    } else {
+      toast.error(`No se pudo reproducir: ${result.error}`);
+    }
+  }
+
+  return (
+    <Button variant="outline" size="sm" className="w-fit" onClick={handleClick} disabled={playing}>
+      {playing ? "Reproduciendo..." : "Probar sonido"}
+    </Button>
   );
 }
 
