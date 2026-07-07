@@ -38,10 +38,29 @@ export function SimulationRuntime() {
     if (!hasHydrated) return;
 
     const interval = setInterval(() => {
-      const state = useDashboardStore.getState();
+      let state = useDashboardStore.getState();
       if (!state.isRunning) return;
 
       const now = Date.now();
+      const virtualTimeBeforeLoop = computeVirtualTime(state.config, state.simStartedAt, now);
+
+      // En velocidades comprimidas (rápida/media/demo) la "jornada" no está
+      // atada al reloj real, así que al terminar se reinicia sola para
+      // encadenar un día nuevo en vez de quedarse parada esperando a que
+      // alguien pulse "Reiniciar" — así la simulación sigue viva sin
+      // importar cuándo se abra la página. En modo real sí se respeta el
+      // horario configurado tal cual.
+      if (virtualTimeBeforeLoop.hasFinished && state.config.speed !== "real") {
+        state.resetDay();
+        state.addActivity({
+          id: crypto.randomUUID(),
+          timestamp: now,
+          type: "milestone",
+          message: "Nueva jornada iniciada automáticamente",
+        });
+        state = useDashboardStore.getState();
+      }
+
       const virtualTime = computeVirtualTime(state.config, state.simStartedAt, now);
 
       state.promoteOrderStatuses(now);
