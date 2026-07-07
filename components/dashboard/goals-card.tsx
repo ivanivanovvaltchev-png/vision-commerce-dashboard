@@ -50,7 +50,7 @@ export function GoalsCard({ kpis }: { kpis: Kpis }) {
       <CardContent className="flex flex-col gap-4">
         {goals.map((goal) => (
           <div key={goal.key} className="flex flex-col gap-1.5">
-            <div className="flex items-baseline justify-between text-sm">
+            <div className="flex flex-wrap items-baseline justify-between gap-x-2 gap-y-0.5 text-sm">
               <span className="font-medium">{goal.label}</span>
               <span className="tabular-nums text-muted-foreground">
                 {goal.actualLabel} / {goal.targetLabel}

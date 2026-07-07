@@ -2,9 +2,14 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { DEFAULT_PRODUCTS, RETIRED_DEFAULT_PRODUCT_IDS } from "./default-products";
 import { STATUS_PROMOTION_MS } from "./simulation";
-import { ActivityEvent, DayConfig, Order, Product } from "./types";
+import { ActivityEvent, DailyTotals, DayConfig, Order, Product } from "./types";
 
-const MAX_ORDERS = 300;
+// "orders" se guarda recortado (para pedidos recientes, gráfico por hora,
+// productos/clientes top) por rendimiento y tamaño de localStorage. Los
+// totales del día (ventas, beneficio, pedidos, unidades) se llevan aparte en
+// contadores acumulados que NUNCA se recortan, para que no se "congelen" ni
+// pierdan datos al superar el límite del array.
+const MAX_ORDERS = 5000;
 const MAX_ACTIVITY = 150;
 
 export const DEFAULT_CONFIG: DayConfig = {
@@ -30,6 +35,7 @@ type DashboardState = {
   activity: ActivityEvent[];
   currentSessions: number;
   sessionsToday: number;
+  totals: DailyTotals;
   reachedMilestones: number[];
   orderSequence: number;
   simStartedAt: number;
@@ -62,6 +68,7 @@ export const useDashboardStore = create<DashboardState>()(
       activity: [],
       currentSessions: 0,
       sessionsToday: 0,
+      totals: { revenue: 0, profit: 0, ordersCount: 0, unitsSold: 0 },
       reachedMilestones: [],
       orderSequence: 1000,
       simStartedAt: Date.now(),
@@ -86,6 +93,12 @@ export const useDashboardStore = create<DashboardState>()(
           return {
             orders: [{ ...order, sequence }, ...state.orders].slice(0, MAX_ORDERS),
             orderSequence: sequence,
+            totals: {
+              revenue: state.totals.revenue + order.amount,
+              profit: state.totals.profit + order.profit,
+              ordersCount: state.totals.ordersCount + 1,
+              unitsSold: state.totals.unitsSold + order.quantity,
+            },
           };
         }),
 
@@ -122,6 +135,7 @@ export const useDashboardStore = create<DashboardState>()(
           reachedMilestones: [],
           currentSessions: 0,
           sessionsToday: 0,
+          totals: { revenue: 0, profit: 0, ordersCount: 0, unitsSold: 0 },
           orderSequence: 1000,
           simStartedAt: Date.now(),
         }),

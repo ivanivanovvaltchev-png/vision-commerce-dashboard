@@ -1,5 +1,11 @@
 "use client";
 
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
 import { useDashboardStore } from "@/lib/store";
 import {
@@ -14,6 +20,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useEffect } from "react";
 
 type NavItem = {
   href: string;
@@ -24,9 +31,9 @@ type NavItem = {
 
 function useOrderBadge(): number | undefined {
   const hasHydrated = useDashboardStore((s) => s.hasHydrated);
-  const orders = useDashboardStore((s) => s.orders);
+  const ordersCount = useDashboardStore((s) => s.totals.ordersCount);
   if (!hasHydrated) return undefined;
-  return orders.length > 0 ? orders.length : undefined;
+  return ordersCount > 0 ? ordersCount : undefined;
 }
 
 const DISABLED_ITEMS: { label: string; icon: React.ElementType }[] = [
@@ -34,7 +41,7 @@ const DISABLED_ITEMS: { label: string; icon: React.ElementType }[] = [
   { label: "Descuentos", icon: Percent },
 ];
 
-export function AppSidebar() {
+function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
   const pathname = usePathname();
   const ordersBadge = useOrderBadge();
 
@@ -47,7 +54,7 @@ export function AppSidebar() {
   ];
 
   return (
-    <aside className="flex h-full w-60 shrink-0 flex-col border-r bg-sidebar text-sidebar-foreground">
+    <div className="flex h-full flex-col">
       <nav className="flex flex-1 flex-col gap-0.5 overflow-y-auto p-2">
         {items.map((item) => {
           const Icon = item.icon;
@@ -56,6 +63,7 @@ export function AppSidebar() {
             <Link
               key={item.href}
               href={item.href}
+              onClick={onNavigate}
               className={cn(
                 "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors",
                 active
@@ -94,6 +102,7 @@ export function AppSidebar() {
       <div className="border-t p-2">
         <Link
           href="/settings"
+          onClick={onNavigate}
           className={cn(
             "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors",
             pathname === "/settings"
@@ -105,6 +114,43 @@ export function AppSidebar() {
           Configuración del día
         </Link>
       </div>
-    </aside>
+    </div>
+  );
+}
+
+export function AppSidebar({
+  mobileOpen,
+  onMobileOpenChange,
+}: {
+  mobileOpen: boolean;
+  onMobileOpenChange: (open: boolean) => void;
+}) {
+  const pathname = usePathname();
+
+  useEffect(() => {
+    onMobileOpenChange(false);
+    // Solo queremos cerrar el drawer cuando cambia de página, no en cada
+    // cambio de la función de callback.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pathname]);
+
+  return (
+    <>
+      <aside className="hidden h-full w-60 shrink-0 flex-col border-r bg-sidebar text-sidebar-foreground lg:flex">
+        <SidebarNav />
+      </aside>
+
+      <Sheet open={mobileOpen} onOpenChange={onMobileOpenChange}>
+        <SheetContent
+          side="left"
+          className="bg-sidebar p-0 text-sidebar-foreground [&_[data-slot=sheet-close]]:text-sidebar-foreground"
+        >
+          <SheetHeader className="border-b">
+            <SheetTitle>Menú</SheetTitle>
+          </SheetHeader>
+          <SidebarNav onNavigate={() => onMobileOpenChange(false)} />
+        </SheetContent>
+      </Sheet>
+    </>
   );
 }

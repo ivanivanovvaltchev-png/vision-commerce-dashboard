@@ -41,7 +41,7 @@ export function OrdersView() {
   }
 
   return (
-    <div className="mx-auto flex w-full max-w-7xl flex-col gap-4 p-6">
+    <div className="mx-auto flex w-full max-w-7xl flex-col gap-4 p-4 sm:p-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-2">
           <Inbox className="h-5 w-5 text-muted-foreground" />

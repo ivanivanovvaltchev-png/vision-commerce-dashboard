@@ -62,7 +62,7 @@ export function SimulationRuntime() {
       const order = maybeGenerateOrder(
         state.config,
         state.products,
-        state.orders.length,
+        state.totals.ordersCount,
         virtualTime,
         state.simStartedAt,
         now
@@ -101,8 +101,8 @@ export function SimulationRuntime() {
           });
         }
 
-        const updatedOrders = [order, ...state.orders];
-        const kpis = computeKpis(updatedOrders, useDashboardStore.getState().sessionsToday, state.config);
+        const freshState = useDashboardStore.getState();
+        const kpis = computeKpis(freshState.totals, freshState.sessionsToday, state.config);
 
         for (const threshold of MILESTONE_THRESHOLDS) {
           if (kpis.revenueProgress >= threshold && !state.reachedMilestones.includes(threshold)) {

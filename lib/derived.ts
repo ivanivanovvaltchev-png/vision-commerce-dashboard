@@ -1,4 +1,4 @@
-import { DayConfig, HourlyStat, Order } from "./types";
+import { DailyTotals, DayConfig, HourlyStat, Order } from "./types";
 
 export type Kpis = {
   revenue: number;
@@ -26,11 +26,8 @@ function progressPct(actual: number, target: number): number {
   return Math.min(100, (actual / target) * 100);
 }
 
-export function computeKpis(orders: Order[], sessionsToday: number, config: DayConfig): Kpis {
-  const revenue = orders.reduce((sum, o) => sum + o.amount, 0);
-  const profit = orders.reduce((sum, o) => sum + o.profit, 0);
-  const ordersCount = orders.length;
-  const unitsSold = orders.reduce((sum, o) => sum + o.quantity, 0);
+export function computeKpis(totals: DailyTotals, sessionsToday: number, config: DayConfig): Kpis {
+  const { revenue, profit, ordersCount, unitsSold } = totals;
   const averageTicket = ordersCount > 0 ? revenue / ordersCount : 0;
   const conversionRate = sessionsToday > 0 ? (ordersCount / sessionsToday) * 100 : 0;
   const targetProfit = computeTargetProfit(config);

@@ -19,6 +19,7 @@ export function DashboardView() {
   const activity = useDashboardStore((s) => s.activity);
   const currentSessions = useDashboardStore((s) => s.currentSessions);
   const sessionsToday = useDashboardStore((s) => s.sessionsToday);
+  const totals = useDashboardStore((s) => s.totals);
   const simStartedAt = useDashboardStore((s) => s.simStartedAt);
   const isRunning = useDashboardStore((s) => s.isRunning);
   const toggleRunning = useDashboardStore((s) => s.toggleRunning);
@@ -42,8 +43,8 @@ export function DashboardView() {
   );
 
   const kpis = useMemo(
-    () => computeKpis(orders, sessionsToday, config),
-    [orders, sessionsToday, config]
+    () => computeKpis(totals, sessionsToday, config),
+    [totals, sessionsToday, config]
   );
   const hourlyStats = useMemo(() => computeHourlyStats(orders), [orders]);
 
@@ -52,7 +53,7 @@ export function DashboardView() {
   }
 
   return (
-    <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 p-6">
+    <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 p-4 sm:p-6">
       <Greeting now={now} />
 
       <HomeStatsBar

@@ -24,6 +24,7 @@ import {
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { sendNtfyNotification } from "@/lib/ntfy";
+import { speedLabel } from "@/lib/simulation";
 import { playSaleSound } from "@/lib/sound";
 import { useDashboardStore } from "@/lib/store";
 import { DayConfig, ProfitMode, SimulationSpeed } from "@/lib/types";
@@ -64,7 +65,7 @@ function DayConfigFormFields() {
   }
 
   return (
-    <div className="mx-auto flex w-full max-w-3xl flex-col gap-6 p-6">
+    <div className="mx-auto flex w-full max-w-3xl flex-col gap-6 p-4 sm:p-6">
       <div>
         <h1 className="text-2xl font-semibold tracking-tight">Configuración del día</h1>
         <p className="mt-1 text-sm text-muted-foreground">
@@ -109,7 +110,11 @@ function DayConfigFormFields() {
               onValueChange={(value) => commit("profitMode", value as ProfitMode)}
             >
               <SelectTrigger id="profitMode">
-                <SelectValue />
+                <SelectValue>
+                  {(value: ProfitMode) =>
+                    value === "margin" ? "Margen (%)" : "Importe objetivo (€)"
+                  }
+                </SelectValue>
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="margin">Margen (%)</SelectItem>
@@ -197,7 +202,7 @@ function DayConfigFormFields() {
               onValueChange={(value) => commit("speed", value as SimulationSpeed)}
             >
               <SelectTrigger id="speed">
-                <SelectValue />
+                <SelectValue>{(value: SimulationSpeed) => speedLabel(value)}</SelectValue>
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="real">Real — sincronizada con el reloj del día</SelectItem>

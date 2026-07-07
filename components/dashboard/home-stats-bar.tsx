@@ -98,16 +98,18 @@ export function HomeStatsBar({
         </div>
       </div>
 
-      <div className="flex flex-wrap gap-x-10 gap-y-4 rounded-lg border bg-card px-5 py-4">
+      <div className="grid grid-cols-2 gap-x-6 gap-y-4 rounded-lg border bg-card px-4 py-4 sm:grid-cols-3 sm:px-5 lg:grid-cols-6">
         {stats.map((stat) => (
-          <div key={stat.key} className="flex flex-col gap-1">
+          <div key={stat.key} className="flex min-w-0 flex-col gap-1">
             <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
               {stat.label}
               {stat.live && (
-                <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-[#0ca30c]" />
+                <span className="h-1.5 w-1.5 shrink-0 animate-pulse rounded-full bg-[#0ca30c]" />
               )}
             </span>
-            <span className="text-xl font-semibold tabular-nums">{stat.value}</span>
+            <span className="truncate text-lg font-semibold tabular-nums sm:text-xl">
+              {stat.value}
+            </span>
           </div>
         ))}
       </div>

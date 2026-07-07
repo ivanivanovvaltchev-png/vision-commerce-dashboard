@@ -260,20 +260,32 @@ export type SessionsTickResult = {
   gainedSession: boolean;
 };
 
+const SESSION_JOIN_PROBABILITY = 0.5;
+const SESSION_LEAVE_RATE_PER_VISITOR = 0.08;
+
 /**
  * Avanza un tick de sesiones. "sessionsToday" es un acumulado que solo crece;
  * "currentSessions" (visitantes concurrentes en vivo) sube cuando entra una
  * sesión nueva y baja cuando alguien se va, pero nunca puede superar el
  * acumulado del día — no puede haber más gente navegando ahora mismo que el
  * total de sesiones que ha habido hoy.
+ *
+ * Cada visitante actual tiene una probabilidad independiente de irse en este
+ * tick (no una cantidad fija) para que, en equilibrio, entradas y salidas se
+ * compensen alrededor de un número estable en vez de colapsar siempre a 0
+ * (que es lo que pasaba si la salida media superaba a la entrada media).
  */
 export function tickSessions(currentSessions: number, sessionsToday: number): SessionsTickResult {
-  const gainedSession = Math.random() < 0.2;
+  const gainedSession = Math.random() < SESSION_JOIN_PROBABILITY;
   const nextSessionsToday = gainedSession ? sessionsToday + 1 : sessionsToday;
 
   let next = gainedSession ? currentSessions + 1 : currentSessions;
-  const leaving = randomInt(0, 2);
-  next = Math.max(0, next - leaving);
+  for (let i = 0; i < next; i++) {
+    if (Math.random() < SESSION_LEAVE_RATE_PER_VISITOR) {
+      next -= 1;
+    }
+  }
+  next = Math.max(0, next);
   next = Math.min(next, nextSessionsToday);
 
   return { currentSessions: next, sessionsToday: nextSessionsToday, gainedSession };

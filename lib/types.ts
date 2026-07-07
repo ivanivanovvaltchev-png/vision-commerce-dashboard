@@ -69,3 +69,10 @@ export type HourlyStat = {
   revenue: number;
   orders: number;
 };
+
+export type DailyTotals = {
+  revenue: number;
+  profit: number;
+  ordersCount: number;
+  unitsSold: number;
+};
