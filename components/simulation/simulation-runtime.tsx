@@ -7,6 +7,7 @@ import { computeKpis } from "@/lib/derived";
 import { randomGeoPoint } from "@/lib/fake-data";
 import { sendNtfyNotification } from "@/lib/ntfy";
 import {
+  collectActiveCountries,
   computeVirtualTime,
   maybeGenerateOrder,
   tickSessions,
@@ -69,7 +70,7 @@ export function SimulationRuntime() {
       state.setCurrentSessions(sessionsTick.currentSessions);
       if (sessionsTick.gainedSession) {
         state.incrementSessionsToday();
-        const geo = randomGeoPoint();
+        const geo = randomGeoPoint(collectActiveCountries(state.products));
         state.addActivity({
           id: crypto.randomUUID(),
           timestamp: now,

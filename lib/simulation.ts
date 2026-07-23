@@ -111,6 +111,27 @@ function pickWeightedProduct(products: Product[]): Product | null {
   return pool[pool.length - 1];
 }
 
+/**
+ * Todos los países en los que vende al menos un producto del catálogo (con
+ * probabilidad > 0), para que la actividad genérica del sitio (sesiones)
+ * refleje los mercados reales configurados en vez de asumir siempre España.
+ */
+export function collectActiveCountries(products: Product[]): string[] {
+  const countries = new Set<string>();
+
+  for (const product of products) {
+    if (product.probability <= 0) continue;
+    const productCountries = product.countries && product.countries.length > 0
+      ? product.countries
+      : ["España"];
+    for (const country of productCountries) {
+      countries.add(country);
+    }
+  }
+
+  return countries.size > 0 ? Array.from(countries) : ["España"];
+}
+
 function randomInt(min: number, max: number): number {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
