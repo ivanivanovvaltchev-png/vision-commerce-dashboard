@@ -36,6 +36,10 @@ function useOrderBadge(): number | undefined {
   return ordersCount > 0 ? ordersCount : undefined;
 }
 
+function formatBadgeCount(count: number): string {
+  return count > 999 ? "+999" : String(count);
+}
+
 const DISABLED_ITEMS: { label: string; icon: React.ElementType }[] = [
   { label: "Crecimiento", icon: Megaphone },
   { label: "Descuentos", icon: Percent },
@@ -75,7 +79,7 @@ function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
               <span className="truncate">{item.label}</span>
               {item.badge ? (
                 <span className="ml-auto flex h-6 min-w-6 items-center justify-center rounded-md bg-muted px-1.5 text-xs font-semibold text-muted-foreground">
-                  {item.badge}
+                  {formatBadgeCount(item.badge)}
                 </span>
               ) : null}
             </Link>
