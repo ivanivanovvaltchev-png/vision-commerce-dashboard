@@ -15,12 +15,20 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
+import { AVAILABLE_COUNTRIES } from "@/lib/fake-data";
 import { estimateAverageProfit } from "@/lib/simulation";
 import { Product } from "@/lib/types";
+import { cn } from "@/lib/utils";
 
 type Draft = Omit<Product, "id">;
 
-const EMPTY_DRAFT: Draft = { name: "", price: 0, cost: 0, probability: 50 };
+const EMPTY_DRAFT: Draft = {
+  name: "",
+  price: 0,
+  cost: 0,
+  probability: 50,
+  countries: ["España"],
+};
 
 type Props = {
   product?: Product;
@@ -45,6 +53,16 @@ export function ProductFormDialog({ product, onSubmit, trigger }: Props) {
     setDraft((d) => ({ ...d, [key]: value }));
   }
 
+  function toggleCountry(country: string) {
+    setDraft((d) => {
+      const current = d.countries ?? [];
+      const next = current.includes(country)
+        ? current.filter((c) => c !== country)
+        : [...current, country];
+      return { ...d, countries: next };
+    });
+  }
+
   const simpleMargin = draft.price > 0 ? ((draft.price - draft.cost) / draft.price) * 100 : 0;
   const estimatedProfit = estimateAverageProfit({ id: "preview", ...draft });
 
@@ -58,6 +76,7 @@ export function ProductFormDialog({ product, onSubmit, trigger }: Props) {
           price: draft.price,
           cost: draft.cost,
           probability: draft.probability,
+          countries: draft.countries,
         };
 
     onSubmit(payload);
@@ -143,6 +162,34 @@ export function ProductFormDialog({ product, onSubmit, trigger }: Props) {
                 update("probability", next);
               }}
             />
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <Label>Países / mercados de venta</Label>
+            <div className="flex flex-wrap gap-2">
+              {AVAILABLE_COUNTRIES.map((country) => {
+                const selected = (draft.countries ?? []).includes(country);
+                return (
+                  <button
+                    key={country}
+                    type="button"
+                    onClick={() => toggleCountry(country)}
+                    className={cn(
+                      "rounded-full border px-3 py-1 text-xs font-medium transition-colors",
+                      selected
+                        ? "border-primary bg-primary text-primary-foreground"
+                        : "border-input bg-transparent text-muted-foreground hover:bg-accent"
+                    )}
+                  >
+                    {country}
+                  </button>
+                );
+              })}
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Las ventas de este producto saldrán solo de ciudades de los países marcados. Sin
+              ninguno marcado, se usa España por defecto.
+            </p>
           </div>
 
           <div className="flex items-center justify-between rounded-md border p-3">

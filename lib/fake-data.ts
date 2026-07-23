@@ -1,18 +1,41 @@
 export type GeoPoint = { city: string; country: string };
 
-// Solo España peninsular: sin Baleares, Canarias, Ceuta ni Melilla.
-export const GEO_POINTS: GeoPoint[] = [
-  { city: "Madrid", country: "España" },
-  { city: "Barcelona", country: "España" },
-  { city: "Valencia", country: "España" },
-  { city: "Sevilla", country: "España" },
-  { city: "Zaragoza", country: "España" },
-  { city: "Málaga", country: "España" },
-  { city: "Bilbao", country: "España" },
-  { city: "Murcia", country: "España" },
-  { city: "Valladolid", country: "España" },
-  { city: "Vigo", country: "España" },
-];
+// Ciudades por país, sin territorios insulares/exclaves (solo continental en
+// cada caso). Un producto elige uno o varios de estos países como mercado y
+// sus ventas simuladas solo saldrán de esas ciudades.
+export const COUNTRY_CITIES: Record<string, string[]> = {
+  España: [
+    "Madrid",
+    "Barcelona",
+    "Valencia",
+    "Sevilla",
+    "Zaragoza",
+    "Málaga",
+    "Bilbao",
+    "Murcia",
+    "Valladolid",
+    "Vigo",
+  ],
+  México: [
+    "Ciudad de México",
+    "Guadalajara",
+    "Monterrey",
+    "Puebla",
+    "Tijuana",
+    "León",
+    "Querétaro",
+    "Mérida",
+  ],
+  Colombia: ["Bogotá", "Medellín", "Cali", "Barranquilla", "Cartagena"],
+  Argentina: ["Buenos Aires", "Córdoba", "Rosario", "Mendoza", "La Plata"],
+  Chile: ["Santiago", "Valparaíso", "Concepción", "Antofagasta"],
+  Perú: ["Lima", "Arequipa", "Trujillo", "Cusco"],
+  "Estados Unidos": ["Miami", "Los Ángeles", "Houston", "Nueva York", "Chicago"],
+};
+
+export const AVAILABLE_COUNTRIES = Object.keys(COUNTRY_CITIES);
+
+const DEFAULT_COUNTRIES = ["España"];
 
 const FIRST_NAMES = [
   "Alex",
@@ -50,6 +73,15 @@ export function randomCustomerName(): string {
   return `${pick(FIRST_NAMES)} ${pick(LAST_NAMES)}`;
 }
 
-export function randomGeoPoint(): GeoPoint {
-  return pick(GEO_POINTS);
+/**
+ * Sortea una ciudad dentro de los países dados (un producto puede vender en
+ * varios países a la vez). Si no se pasa ninguno, o ninguno es válido, cae a
+ * España por defecto para no romper productos ya creados.
+ */
+export function randomGeoPoint(countries?: string[]): GeoPoint {
+  const pool = countries && countries.length > 0 ? countries : DEFAULT_COUNTRIES;
+  const validCountries = pool.filter((c) => COUNTRY_CITIES[c]);
+  const country = pick(validCountries.length > 0 ? validCountries : DEFAULT_COUNTRIES);
+  const city = pick(COUNTRY_CITIES[country]);
+  return { city, country };
 }

@@ -66,6 +66,7 @@ export function ProductList() {
               <TableHeader>
                 <TableRow>
                   <TableHead>Producto</TableHead>
+                  <TableHead>Mercado</TableHead>
                   <TableHead className="text-right">Precio</TableHead>
                   <TableHead className="text-right">Coste</TableHead>
                   <TableHead className="text-right">Beneficio neto medio</TableHead>
@@ -91,6 +92,18 @@ export function ProductList() {
                               </Badge>
                             )}
                           </div>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex flex-wrap gap-1">
+                          {(product.countries && product.countries.length > 0
+                            ? product.countries
+                            : ["España"]
+                          ).map((country) => (
+                            <Badge key={country} variant="secondary" className="text-[10px]">
+                              {country}
+                            </Badge>
+                          ))}
                         </div>
                       </TableCell>
                       <TableCell className="text-right tabular-nums">

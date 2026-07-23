@@ -4,6 +4,7 @@ export type Product = {
   price: number; // precio de venta total del pedido (del pack, si aplica)
   cost: number; // coste de producto (COGS) del pedido completo
   probability: number; // peso relativo 1-100 usado en el sorteo ponderado
+  countries?: string[]; // países/mercados de venta; vacío o ausente = España
 
   // Economía avanzada de pedido real (opcional). Si fixedQuantity está definido,
   // el producto se trata como un pack de unidades fijas (no se sortea cantidad

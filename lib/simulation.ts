@@ -192,7 +192,7 @@ export function estimateAverageProfit(product: Product): number {
 
 export function buildOrder(product: Product, virtualHour: number): Order {
   const { quantity, amount, profit } = computeOrderEconomics(product);
-  const geo = randomGeoPoint();
+  const geo = randomGeoPoint(product.countries);
   const now = Date.now();
 
   return {
